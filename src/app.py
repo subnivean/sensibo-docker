@@ -9,30 +9,16 @@ DBPATH = "../data/sensibodata.sqlite"
 TBLNAME = f"housedata"
 
 
-@retry(wait=wait_fixed(2), stop=stop_after_attempt(10))
-def get_client():
-    return SensiboClientAPI(secrets.APIKEY)
+@retry(wait=wait_fixed(2), stop=stop_after_attempt(8))
+def get_data():
+    client = SensiboClientAPI(secrets.APIKEY)
+    uid = client.devices()[DEVICENAME]
+    ac_state = client.pod_ac_state(uid)
+    measurements = client.pod_measurement(uid)
+    return ac_state, measurements
 
 
-@retry(wait=wait_fixed(2), stop=stop_after_attempt(10))
-def get_uid(client):
-    return client.devices()[DEVICENAME]
-
-
-@retry(wait=wait_fixed(2), stop=stop_after_attempt(10))
-def get_ac_state(client, uid):
-    return client.pod_ac_state(uid)
-
-
-@retry(wait=wait_fixed(2), stop=stop_after_attempt(10))
-def get_measurements(client, uid):
-    return client.pod_measurement(uid)
-
-
-client = get_client()
-uid = get_uid(client)
-ac_state = get_ac_state(client, uid)
-measurements = get_measurements(client, uid)
+ac_state, measurements = get_data()
 
 # Convert fields as necessary
 ts = ac_state["timestamp"]["time"].split(".")[0].replace("T", " ") + "+00:00"
