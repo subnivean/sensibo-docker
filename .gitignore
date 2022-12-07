@@ -1,4 +1,5 @@
 /data
 /src/__pycache__
 secrets.py
+mysecrets.py
 *.swp
