@@ -1,7 +1,7 @@
 #!/bin/env python
 import sqlite3
 from sensibo_client import SensiboClientAPI
-import secrets
+import mysecrets
 from tenacity import retry, wait_fixed, stop_after_attempt
 
 DEVICENAME = "Living Room"
@@ -11,7 +11,7 @@ TBLNAME = f"housedata"
 
 @retry(wait=wait_fixed(2), stop=stop_after_attempt(8))
 def get_data():
-    client = SensiboClientAPI(secrets.APIKEY)
+    client = SensiboClientAPI(mysecrets.APIKEY)
     uid = client.devices()[DEVICENAME]
     ac_state = client.pod_ac_state(uid)
     measurements = client.pod_measurement(uid)
